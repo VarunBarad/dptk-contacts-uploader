@@ -51,7 +51,7 @@ data class SubBroker(
         val name: String = this.name
         val isValid: Boolean
 
-        isValid = !name.isEmpty()
+        isValid = name.isNotEmpty()
 
         return isValid
     }
@@ -60,7 +60,7 @@ data class SubBroker(
         val address: String = this.address
         val isValid: Boolean
 
-        isValid = !address.isEmpty()
+        isValid = address.isNotEmpty()
 
         return isValid
     }
@@ -69,7 +69,7 @@ data class SubBroker(
         val contactNumber: String = this.contactNumber
         val isValid: Boolean
 
-        isValid = !(contactNumber.isEmpty() || !contactNumber.matches("^(\\+91)?[1-9][0-9]{9}$".toRegex()))
+        isValid = contactNumber.isNotEmpty() && contactNumber.matches("^(\\+91)?[1-9][0-9]{9}$".toRegex())
 
         return isValid
     }
@@ -78,7 +78,7 @@ data class SubBroker(
         val email: String = this.email
         val isValid: Boolean
 
-        isValid = (!email.isEmpty()) && email.matches("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$".toRegex())
+        isValid = email.isNotEmpty() && email.matches("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$".toRegex())
 
         return isValid
     }
@@ -88,7 +88,7 @@ data class SubBroker(
         val isValid: Boolean
 
         //ToDo: Check registration number regex
-        isValid = !registrationNumber.isEmpty()
+        isValid = registrationNumber.isNotEmpty()
 
         return isValid
     }
@@ -97,7 +97,7 @@ data class SubBroker(
         val incorporationDate: String = this.incorporationDate
         var isValid: Boolean by singleAssign()
 
-        if (incorporationDate.isEmpty()) {
+        if (incorporationDate.isNotEmpty()) {
             isValid = false
         } else {
             try {
