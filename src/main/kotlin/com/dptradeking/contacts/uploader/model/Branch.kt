@@ -8,10 +8,10 @@ import tornadofx.*
 
 /**
  * Creator: Varun Barad
- * Date: 27-06-2017
+ * Date: 28-06-2017
  * Project: uploader
  */
-data class Department(
+data class Branch(
         @Expose
         @SerializedName("name")
         val name: String,
@@ -19,22 +19,28 @@ data class Department(
         @SerializedName("alias")
         val alias: String,
         @Expose
+        @SerializedName("address")
+        val address: String,
+        @Expose
+        @SerializedName("contactNumber")
+        val contactNumber: String,
+        @Expose
         @SerializedName("executives")
         val executives: List<Executive>
 ) {
     companion object {
         @JvmStatic
-        fun getInstance(jsonDepartment: String): Department? {
-            var department: Department? by singleAssign()
+        fun getInstance(jsonBranch: String): Branch? {
+            var branch: Branch? by singleAssign()
 
             try {
-                department = Gson().fromJson(jsonDepartment, Department::class.java)
+                branch = Gson().fromJson(jsonBranch, Branch::class.java)
             } catch (e: JsonSyntaxException) {
-                department = null
+                branch = null
                 e.printStackTrace()
             }
 
-            return department
+            return branch
         }
     }
 
@@ -42,10 +48,16 @@ data class Department(
 
     fun validateAlias(): Boolean = this.alias.isNotEmpty()
 
+    fun validateAddress(): Boolean = this.address.isNotEmpty()
+
+    fun validateContactNumber(): Boolean = this.contactNumber.isNotEmpty() && this.contactNumber.matches("^(\\+91)?[1-9][0-9]{9}$".toRegex())
+
     fun validateExecutives(): Boolean = this.executives.filter({ it.validateDetails() }).isNotEmpty()
 
     fun validateDetails(): Boolean = this.validateName() &&
             this.validateAlias() &&
+            this.validateAddress() &&
+            this.validateContactNumber() &&
             this.validateExecutives()
 
     fun toJsonString(): String = Gson().toJson(this)

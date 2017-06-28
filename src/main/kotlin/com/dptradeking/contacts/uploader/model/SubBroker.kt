@@ -34,61 +34,35 @@ data class SubBroker(
         @SerializedName("incorporationDate")
         val incorporationDate: String
 ) {
-    fun getInstance(jsonSubBroker: String): SubBroker? {
-        var subBroker: SubBroker? by singleAssign()
+    companion object {
+        @JvmStatic
+        fun getInstance(jsonSubBroker: String): SubBroker? {
+            var subBroker: SubBroker? by singleAssign()
 
-        try {
-            subBroker = Gson().fromJson(jsonSubBroker, SubBroker::class.java)
-        } catch (e: JsonSyntaxException) {
-            subBroker = null
-            e.printStackTrace()
+            try {
+                subBroker = Gson().fromJson(jsonSubBroker, SubBroker::class.java)
+            } catch (e: JsonSyntaxException) {
+                subBroker = null
+                e.printStackTrace()
+            }
+
+            return subBroker
         }
-
-        return subBroker
     }
 
-    fun validateName(): Boolean {
-        val name: String = this.name
-        val isValid: Boolean
+    fun validateName(): Boolean = this.name.isNotEmpty()
 
-        isValid = name.isNotEmpty()
+    fun validateAddress(): Boolean = this.address.isNotEmpty()
 
-        return isValid
-    }
+    fun validateContactNumber(): Boolean = this.contactNumber.isNotEmpty() && this.contactNumber.matches("^(\\+91)?[1-9][0-9]{9}$".toRegex())
 
-    fun validateAddress(): Boolean {
-        val address: String = this.address
-        val isValid: Boolean
-
-        isValid = address.isNotEmpty()
-
-        return isValid
-    }
-
-    fun validateContactNumber(): Boolean {
-        val contactNumber: String = this.contactNumber
-        val isValid: Boolean
-
-        isValid = contactNumber.isNotEmpty() && contactNumber.matches("^(\\+91)?[1-9][0-9]{9}$".toRegex())
-
-        return isValid
-    }
-
-    fun validateEmail(): Boolean {
-        val email: String = this.email
-        val isValid: Boolean
-
-        isValid = email.isNotEmpty() && email.matches("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$".toRegex())
-
-        return isValid
-    }
+    fun validateEmail(): Boolean = this.email.isNotEmpty() && this.email.matches("^[_A-Za-z0-9\\-+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$".toRegex())
 
     fun validateRegistrationNumber(): Boolean {
-        val registrationNumber: String = this.registrationNumber
         val isValid: Boolean
 
         //ToDo: Check registration number regex
-        isValid = registrationNumber.isNotEmpty()
+        isValid = this.registrationNumber.isNotEmpty()
 
         return isValid
     }
@@ -115,16 +89,12 @@ data class SubBroker(
         return isValid
     }
 
-    fun validateDetails(): Boolean {
-        return this.validateName() &&
-                this.validateAddress() &&
-                this.validateContactNumber() &&
-                this.validateEmail() &&
-                this.validateRegistrationNumber() &&
-                this.validateIncorporationDate()
-    }
+    fun validateDetails(): Boolean = this.validateName() &&
+            this.validateAddress() &&
+            this.validateContactNumber() &&
+            this.validateEmail() &&
+            this.validateRegistrationNumber() &&
+            this.validateIncorporationDate()
 
-    fun toJsonString(): String {
-        return Gson().toJson(this)
-    }
+    fun toJsonString(): String = Gson().toJson(this)
 }
