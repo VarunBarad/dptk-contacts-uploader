@@ -29,7 +29,10 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     compile 'no.tornado:tornadofx:1.7.5'
+
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     compile 'com.google.code.gson:gson:2.8.1'
 
+    // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+    compile 'org.apache.poi:poi-ooxml:3.16'
 }
