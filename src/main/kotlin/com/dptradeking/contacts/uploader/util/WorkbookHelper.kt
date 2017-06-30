@@ -1,5 +1,6 @@
 package com.dptradeking.contacts.uploader.util
 
+import com.dptradeking.contacts.uploader.model.Executive
 import com.dptradeking.contacts.uploader.model.SubBroker
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
@@ -27,6 +28,60 @@ fun getTitlesFromWorksheet(sheet: Sheet): Map<String, Int> {
     }
 
     return titles
+}
+
+fun getExecutives(executivesFile: File): Map<String, List<Executive>> {
+    val executivesMap: MutableMap<String, List<Executive>> = mutableMapOf()
+
+    val workbook = XSSFWorkbook(executivesFile.inputStream())
+
+    workbook
+            .asIterable()
+            .forEach { executivesMap.put(it.sheetName, sheetToExecutives(it)) }
+
+    workbook.close()
+
+    return executivesMap
+}
+
+fun sheetToExecutives(sheet: Sheet): List<Executive> {
+    val titles = getTitlesFromWorksheet(sheet)
+
+    // Check whether all the columns required are present or not
+    if (!titles.containsKey("name")) {
+        throw NullPointerException("The name of the executive must come under a column titled \"name\" in a sheet named \"${sheet.sheetName}\".\nIn case if you don't want to have that information, keep an empty cell under the column containing that title.")
+    }
+    if (!titles.containsKey("designation")) {
+        throw NullPointerException("The designation of the executive must come under a column titled \"designation\" in a sheet named \"${sheet.sheetName}\".\nIn case if you don't want to have that information, keep an empty cell under the column containing that title.")
+    }
+    if (!titles.containsKey("contactNumber")) {
+        throw NullPointerException("The contact-number of the executive must come under a column titled \"contactNumber\" in a sheet named \"${sheet.sheetName}\".\nIn case if you don't want to have that information, keep an empty cell under the column containing that title.")
+    }
+    if (!titles.containsKey("email")) {
+        throw NullPointerException("The email of the executive must come under a column titled \"email\" in a sheet named \"${sheet.sheetName}\".\nIn case if you don't want to have that information, keep an empty cell under the column containing that title.")
+    }
+
+    val executives: MutableList<Executive> = mutableListOf()
+
+    val rowIterator = sheet.rowIterator()
+    rowIterator.next() // Skip the titles row
+
+    rowIterator.forEachRemaining {
+        val executive = Executive(
+                it.getCell(titles["name"]!!).stringCellValue,
+                it.getCell(titles["designation"]!!).stringCellValue,
+                it.getCell(titles["contactNumber"]!!).stringCellValue,
+                it.getCell(titles["email"]!!).stringCellValue
+        )
+
+        if (executive.validateDetails()) {
+            executives.add(executive)
+        } else {
+            throw NullPointerException("Invalid details for the executive in row ${it.rowNum + 1} in a sheet named ${sheet.sheetName}.")
+        }
+    }
+
+    return executives
 }
 
 fun getSubBrokers(mainFile: File): List<SubBroker> {
