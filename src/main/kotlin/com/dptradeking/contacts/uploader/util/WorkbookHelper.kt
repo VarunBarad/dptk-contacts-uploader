@@ -1,5 +1,6 @@
 package com.dptradeking.contacts.uploader.util
 
+import com.dptradeking.contacts.uploader.model.Department
 import com.dptradeking.contacts.uploader.model.Executive
 import com.dptradeking.contacts.uploader.model.SubBroker
 import org.apache.poi.ss.usermodel.Row
@@ -130,16 +131,64 @@ fun getSubBrokers(mainFile: File): List<SubBroker> {
             if (s.validateDetails()) {
                 subBrokers.add(s)
             } else {
-                throw NullPointerException("The details of sub-brokers needs to go in a worksheet named \"Sub-Brokers\".\nIn the case when you don't have any sub-brokers keep an empty sheet by the same name.")
+                throw IllegalArgumentException("Invalid details for sub-broker in row ${row.rowNum + 1} of sheet \"Sub-Brokers\" in file \"main.xlsx\".")
             }
         }
 
         workbook.close()
     } else {
         workbook.close()
-        throw IllegalArgumentException("The details of sub-brokers needs to go in a worksheet named \"Sub-Brokers\".\n" +
+        throw NullPointerException("The details of sub-brokers needs to go in a worksheet named \"Sub-Brokers\".\n" +
                 "In the case when you don't have any sub-brokers keep an empty sheet by the same name.")
     }
 
     return subBrokers
+}
+
+fun getDepartments(mainFile: File, departmentsFile: File): List<Department> {
+    val executivesMap = getExecutives(departmentsFile)
+    val departments: MutableList<Department>
+
+    val workbook = XSSFWorkbook(mainFile.inputStream())
+    val departmentsSheet: Sheet? = workbook.getSheet("Head-Office")
+
+    if (departmentsSheet != null) {
+        val titles = getTitlesFromWorksheet(departmentsSheet)
+
+        if (!titles.containsKey("name")) {
+            throw NullPointerException("The name of the department must come under a column titled \"name\" in the sheet named \"Head-Office\".\nIn case if you don't want to have that information, keep an empty cell under the column containing that title.")
+        }
+        if (!titles.containsKey("alias")) {
+            throw NullPointerException("The alias of the department must come under a column titled \"alias\" in the sheet named \"Head-Office\".\nIn case if you don't want to have that information, keep an empty cell under the column containing that title.")
+        }
+
+        departments = mutableListOf()
+        val rowIterator = departmentsSheet.rowIterator()
+        rowIterator.next() // Skip the titles row
+
+        rowIterator.forEachRemaining {
+            if (executivesMap.containsKey(it.getCell(titles["name"]!!).stringCellValue)) {
+                val dep = Department(
+                        it.getCell(titles["name"]!!).stringCellValue,
+                        it.getCell(titles["alias"]!!).stringCellValue,
+                        executivesMap.getOrDefault(it.getCell(titles["name"]!!).stringCellValue, listOf())
+                )
+
+                if (dep.validateDetails()) {
+                    departments.add(dep)
+                } else {
+                    throw IllegalArgumentException("Invalid details for either the department in row ${it.rowNum + 1} of sheet \"Head-Office\" in file \"main.xlsx\" or it's executives in sheet named ${dep.name} in file \"headOffice.xlsx\".")
+                }
+            } else {
+                throw NullPointerException("There is no sheet for ${it.getCell(titles["name"]!!).stringCellValue} department in the file \"headOffice.xlsx\".\nPlease make sure that every department entry from the \"main.xlsx\" file has a sheet with same name in the \"headOffice.xlsx\" file with appropriate column headers.")
+            }
+        }
+
+        workbook.close()
+    } else {
+        workbook.close()
+        throw IllegalArgumentException("The details of departments of Head-Office needs to go in a worksheet named \"Head-Office\" inside the file \"main.xlsx\".\nIn the case when you don't have any departments keep an empty sheet by the same name with appropriate column headers.")
+    }
+
+    return departments
 }
