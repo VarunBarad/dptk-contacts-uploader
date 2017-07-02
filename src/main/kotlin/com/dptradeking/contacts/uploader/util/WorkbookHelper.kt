@@ -1,5 +1,6 @@
 package com.dptradeking.contacts.uploader.util
 
+import com.dptradeking.contacts.uploader.model.Branch
 import com.dptradeking.contacts.uploader.model.Department
 import com.dptradeking.contacts.uploader.model.Executive
 import com.dptradeking.contacts.uploader.model.SubBroker
@@ -191,4 +192,60 @@ fun getDepartments(mainFile: File, departmentsFile: File): List<Department> {
     }
 
     return departments
+}
+
+fun getBranches(mainFile: File, branchesFile: File): List<Branch> {
+    val executivesMap = getExecutives(branchesFile)
+    val branches: MutableList<Branch>
+
+    val workbook = XSSFWorkbook(mainFile.inputStream())
+    val branchesSheet: Sheet? = workbook.getSheet("Branches")
+
+    if (branchesSheet != null) {
+        val titles = getTitlesFromWorksheet(branchesSheet)
+
+        if (!titles.containsKey("name")) {
+            throw NullPointerException("The name of the branch must come under a column titled \"name\" in the sheet named \"Branches\".\nIn case if you don't want to have that information, keep an empty cell under the column containing that title.")
+        }
+        if (!titles.containsKey("alias")) {
+            throw NullPointerException("The alias of the branch must come under a column titled \"alias\" in the sheet named \"Branches\".\nIn case if you don't want to have that information, keep an empty cell under the column containing that title.")
+        }
+        if (!titles.containsKey("address")) {
+            throw NullPointerException("The address of the branch must come under a column titled \"address\" in the sheet named \"Branches\".\nIn case if you don't want to have that information, keep an empty cell under the column containing that title.")
+        }
+        if (!titles.containsKey("contactNumber")) {
+            throw NullPointerException("The contact-number of the branch must come under a column titled \"contactNumber\" in the sheet named \"Branches\".\nIn case if you don't want to have that information, keep an empty cell under the column containing that title.")
+        }
+
+        branches = mutableListOf()
+        val rowIterator = branchesSheet.rowIterator()
+        rowIterator.next() // Skip the titles row
+
+        rowIterator.forEachRemaining {
+            if (executivesMap.containsKey(it.getCell(titles["name"]!!).stringCellValue)) {
+                val branch = Branch(
+                        it.getCell(titles["name"]!!).stringCellValue,
+                        it.getCell(titles["alias"]!!).stringCellValue,
+                        it.getCell(titles["address"]!!).stringCellValue,
+                        it.getCell(titles["contactNumber"]!!).stringCellValue,
+                        executivesMap.getOrDefault(it.getCell(titles["name"]!!).stringCellValue, listOf())
+                )
+
+                if (branch.validateDetails()) {
+                    branches.add(branch)
+                } else {
+                    throw IllegalArgumentException("Invalid details for either the branch in row ${it.rowNum + 1} of sheet \"Branch\" in file \"main.xlsx\" or it's executives in sheet named ${branch.name} in file \"branches.xlsx\".")
+                }
+            } else {
+                throw NullPointerException("There is no sheet for ${it.getCell(titles["name"]!!).stringCellValue} branch in the file \"branches.xlsx\".\nPlease make sure that every branch entry from the \"main.xlsx\" file has a sheet with same name in the \"branches.xlsx\" file with appropriate column headers.")
+            }
+        }
+
+        workbook.close()
+    } else {
+        workbook.close()
+        throw IllegalArgumentException("The details of branches needs to go in a worksheet named \"Branches\" inside the file \"main.xlsx\".\nIn the case when you don't have any branches, keep an empty sheet by the same name with appropriate column headers.")
+    }
+
+    return branches
 }
