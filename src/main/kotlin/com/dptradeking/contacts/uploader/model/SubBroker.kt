@@ -72,8 +72,6 @@ data class SubBroker(
         var isValid: Boolean by singleAssign()
 
         if (incorporationDate.isNotEmpty()) {
-            isValid = false
-        } else {
             try {
                 val formatter = SimpleDateFormat("yyyy-MM-dd")
                 val date = formatter.parse(incorporationDate)
@@ -83,7 +81,8 @@ data class SubBroker(
                 e.printStackTrace()
                 isValid = false
             }
-
+        } else {
+            isValid = false
         }
 
         return isValid
