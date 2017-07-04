@@ -15,26 +15,41 @@ import java.io.FileNotFoundException
  * Date: 02-07-2017
  * Project: uploader
  */
-class FileSelectorController(val view: FileSelecterView) : Controller() {
+class FileSelectorController : Controller() {
     lateinit var subBrokers: List<SubBroker>
     lateinit var headOfficeDepartments: List<Department>
     lateinit var branches: List<Branch>
 
-    fun verifyFiles(): Boolean {
-        var detailsAppropriate = false
+    fun verifyFiles(
+            mainFilePath: String,
+            headOfficeFilePath: String,
+            branchesFilePath: String
+    ): Boolean {
+        var detailsAppropriate: Boolean
 
         try {
-            val mainFile: File = File(this.view.getMainFilePath())
-            val headOfficeFile: File = File(this.view.getHeadOfficeFilePath())
-            val branchesFile: File = File(this.view.getBranchesFilePath())
+            val mainFile: File = File(mainFilePath)
+            val headOfficeFile: File = File(headOfficeFilePath)
+            val branchesFile: File = File(branchesFilePath)
 
             subBrokers = getSubBrokers(mainFile)
             headOfficeDepartments = getDepartments(mainFile, headOfficeFile)
             branches = getBranches(mainFile, branchesFile)
+
+            detailsAppropriate = true
         } catch (e: FileNotFoundException) {
             detailsAppropriate = false
+            println(e.message)
+        } catch (e: NullPointerException) {
+            detailsAppropriate = false
+            println(e.message)
+        } catch (e: IllegalArgumentException) {
+            detailsAppropriate = false
+            println(e.message)
         }
 
         return detailsAppropriate
     }
+
+
 }
