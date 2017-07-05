@@ -93,10 +93,10 @@ class FileSelecterView : View("DP-TradeKING Contacts Uploader") {
                     runAsync {
                         controller.verifyFiles(mainFilePath, headOfficeFilePath, branchesFilePath)
                     } ui {
-                        if (it) {
+                        if (it.first) {
                             println("Data in files is correct")
                         } else {
-                            println("Data is not as required")
+                            error(header = "Error in supplied data", content = it.second)
                         }
                     }
                 }

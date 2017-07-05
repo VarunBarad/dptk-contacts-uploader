@@ -24,8 +24,9 @@ class FileSelectorController : Controller() {
             mainFilePath: String,
             headOfficeFilePath: String,
             branchesFilePath: String
-    ): Boolean {
+    ): Pair<Boolean, String> {
         var detailsAppropriate: Boolean
+        var message: String = ""
 
         try {
             val mainFile: File = File(mainFilePath)
@@ -39,16 +40,16 @@ class FileSelectorController : Controller() {
             detailsAppropriate = true
         } catch (e: FileNotFoundException) {
             detailsAppropriate = false
-            println(e.message)
+            message = e.message!!
         } catch (e: NullPointerException) {
             detailsAppropriate = false
-            println(e.message)
+            message = e.message!!
         } catch (e: IllegalArgumentException) {
             detailsAppropriate = false
-            println(e.message)
+            message = e.message!!
         }
 
-        return detailsAppropriate
+        return Pair(detailsAppropriate, message)
     }
 
 
