@@ -37,5 +37,5 @@ dependencies {
     compile 'org.apache.poi:poi-ooxml:3.16'
 
     // https://mvnrepository.com/artifact/com.google.firebase/firebase-admin
-    compile 'com.google.firebase:firebase-admin:5.2.0'
+    compile 'com.google.firebase:firebase-admin:4.1.4'
 }

@@ -95,6 +95,9 @@ class FileSelecterView : View("DP-TradeKING Contacts Uploader") {
                     } ui {
                         if (it.first) {
                             println("Data in files is correct")
+                            runAsync {
+                                controller.uploadData()
+                            }
                         } else {
                             error(header = "Error in supplied data", content = it.second)
                         }

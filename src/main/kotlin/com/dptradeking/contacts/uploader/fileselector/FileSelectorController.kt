@@ -3,6 +3,7 @@ package com.dptradeking.contacts.uploader.fileselector
 import com.dptradeking.contacts.uploader.model.Branch
 import com.dptradeking.contacts.uploader.model.Department
 import com.dptradeking.contacts.uploader.model.SubBroker
+import com.dptradeking.contacts.uploader.util.FirebaseHandler
 import com.dptradeking.contacts.uploader.util.getBranches
 import com.dptradeking.contacts.uploader.util.getDepartments
 import com.dptradeking.contacts.uploader.util.getSubBrokers
@@ -52,5 +53,8 @@ class FileSelectorController : Controller() {
         return Pair(detailsAppropriate, message)
     }
 
-
+    fun uploadData() {
+        FirebaseHandler().uploadToFirebase(headOffice = headOfficeDepartments, branches = branches, subBrokers = subBrokers)
+        println("Data uploaded successfully")
+    }
 }
