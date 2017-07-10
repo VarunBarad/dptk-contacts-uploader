@@ -45,62 +45,61 @@ class FileSelecterView : View("DP-TradeKING Contacts Uploader") {
             branchesFileField.text = value
         }
 
-    override val root = vbox {
-        hbox {
-            label("Main File")
-            mainFileField = textfield()
-            buttonBrowseMainFile = button("Browse") {
-                action {
-                    val files: List<File> = chooseFile(title = "Select Main workbook", mode = FileChooserMode.Single, filters = extensionFilter)
-                    if (files.isNotEmpty()) {
-                        mainFilePath = files[0].absolutePath
-                    }
-                }
-            }
-        }
-        hbox {
-            label("Head-Office File")
-            headOfficeFileField = textfield()
-            buttonBrowseHeadOfficeFile = button("Browse") {
-                action {
-                    val files: List<File> = chooseFile(title = "Select Head-Office workbook", mode = FileChooserMode.Single, filters = extensionFilter)
-                    if (files.isNotEmpty()) {
-                        headOfficeFilePath = files[0].absolutePath
-                    }
-                }
-            }
-        }
-        hbox {
-            label("Branches File")
-            branchesFileField = textfield()
-            buttonBrowseBranchesFile = button("Browse") {
-                action {
-                    val files: List<File> = chooseFile(title = "Select Branches workbook", mode = FileChooserMode.Single, filters = extensionFilter)
-                    if (files.isNotEmpty()) {
-                        branchesFilePath = files[0].absolutePath
-                    }
-                }
-            }
-        }
-        hbox {
-            buttonCancel = button("Cancel & Exit") {
-                action {
-                    Platform.exit()
-                }
-            }
-            buttonUpload = button("Verify & Upload") {
-                action {
-                    runAsync {
-                        controller.verifyFiles(mainFilePath, headOfficeFilePath, branchesFilePath)
-                    } ui {
-                        if (it.first) {
-                            println("Data in files is correct")
-                            runAsync {
-                                controller.uploadData()
-                            }
-                        } else {
-                            error(header = "Error in supplied data", content = it.second)
+    override val root = form {
+        fieldset("Choose files") {
+            field("Main File") {
+                mainFileField = textfield()
+                buttonBrowseMainFile = button("Browse") {
+                    action {
+                        val files: List<File> = chooseFile(title = "Select Main workbook", mode = FileChooserMode.Single, filters = extensionFilter)
+                        if (files.isNotEmpty()) {
+                            mainFilePath = files[0].absolutePath
                         }
+                    }
+                }
+            }
+            field("Head-Office File") {
+                headOfficeFileField = textfield()
+                buttonBrowseHeadOfficeFile = button("Browse") {
+                    action {
+                        val files: List<File> = chooseFile(title = "Select Head-Office workbook", mode = FileChooserMode.Single, filters = extensionFilter)
+                        if (files.isNotEmpty()) {
+                            headOfficeFilePath = files[0].absolutePath
+                        }
+                    }
+                }
+            }
+            field("Branches File") {
+                branchesFileField = textfield()
+                buttonBrowseBranchesFile = button("Browse") {
+                    action {
+                        val files: List<File> = chooseFile(title = "Select Branches workbook", mode = FileChooserMode.Single, filters = extensionFilter)
+                        if (files.isNotEmpty()) {
+                            branchesFilePath = files[0].absolutePath
+                        }
+                    }
+                }
+            }
+            field {
+                buttonUpload = button("Verify & Upload") {
+                    action {
+                        runAsync {
+                            controller.verifyFiles(mainFilePath, headOfficeFilePath, branchesFilePath)
+                        } ui {
+                            if (it.first) {
+                                println("Data in files is correct")
+                                runAsync {
+                                    controller.uploadData()
+                                }
+                            } else {
+                                error(header = "Error in supplied data", content = it.second)
+                            }
+                        }
+                    }
+                }
+                buttonCancel = button("Exit") {
+                    action {
+                        Platform.exit()
                     }
                 }
             }
