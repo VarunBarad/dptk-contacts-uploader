@@ -2,6 +2,7 @@ package com.dptradeking.contacts.uploader
 
 import com.dptradeking.contacts.uploader.fileselector.FileSelecterView
 import javafx.application.Application
+import javafx.scene.image.Image
 import javafx.stage.Stage
 import tornadofx.*
 
@@ -13,6 +14,7 @@ import tornadofx.*
 class DPTKUploader : App(FileSelecterView::class) {
     override fun start(stage: Stage) {
         stage.isResizable = false
+        stage.icons.add(Image(this.javaClass.getResourceAsStream("/dptk-icon.png")))
         super.start(stage)
     }
 }

@@ -1,7 +1,6 @@
 package com.dptradeking.contacts.uploader.fileselector
 
 import javafx.application.Platform
-import javafx.scene.control.Button
 import javafx.scene.control.TextField
 import javafx.stage.FileChooser
 import tornadofx.*
@@ -12,20 +11,14 @@ import java.io.File
  * Date: 02-07-2017
  * Project: uploader
  */
-class FileSelecterView : View("DP-TradeKING Contacts Uploader") {
+class FileSelecterView : View("DP-TradeKING Contacts") {
     val controller: FileSelectorController by inject()
 
-    val extensionFilter: Array<FileChooser.ExtensionFilter> = arrayOf(FileChooser.ExtensionFilter("Excel Workbook", "*.xlsx"))
+    private val extensionFilter: Array<FileChooser.ExtensionFilter> = arrayOf(FileChooser.ExtensionFilter("Excel Workbook", "*.xlsx"))
 
     private var mainFileField: TextField by singleAssign()
     private var headOfficeFileField: TextField by singleAssign()
     private var branchesFileField: TextField by singleAssign()
-
-    private var buttonBrowseMainFile: Button by singleAssign()
-    private var buttonBrowseHeadOfficeFile: Button by singleAssign()
-    private var buttonBrowseBranchesFile: Button by singleAssign()
-    private var buttonCancel: Button by singleAssign()
-    private var buttonUpload: Button by singleAssign()
 
     var mainFilePath: String
         get() = mainFileField.text
@@ -48,8 +41,10 @@ class FileSelecterView : View("DP-TradeKING Contacts Uploader") {
     override val root = form {
         fieldset("Choose files") {
             field("Main File") {
-                mainFileField = textfield()
-                buttonBrowseMainFile = button("Browse") {
+                mainFileField = textfield {
+                    requestFocus()
+                }
+                button("Browse") {
                     action {
                         val files: List<File> = chooseFile(title = "Select Main workbook", mode = FileChooserMode.Single, filters = extensionFilter)
                         if (files.isNotEmpty()) {
@@ -60,7 +55,7 @@ class FileSelecterView : View("DP-TradeKING Contacts Uploader") {
             }
             field("Head-Office File") {
                 headOfficeFileField = textfield()
-                buttonBrowseHeadOfficeFile = button("Browse") {
+                button("Browse") {
                     action {
                         val files: List<File> = chooseFile(title = "Select Head-Office workbook", mode = FileChooserMode.Single, filters = extensionFilter)
                         if (files.isNotEmpty()) {
@@ -71,7 +66,7 @@ class FileSelecterView : View("DP-TradeKING Contacts Uploader") {
             }
             field("Branches File") {
                 branchesFileField = textfield()
-                buttonBrowseBranchesFile = button("Browse") {
+                button("Browse") {
                     action {
                         val files: List<File> = chooseFile(title = "Select Branches workbook", mode = FileChooserMode.Single, filters = extensionFilter)
                         if (files.isNotEmpty()) {
@@ -80,26 +75,30 @@ class FileSelecterView : View("DP-TradeKING Contacts Uploader") {
                     }
                 }
             }
-            field {
-                buttonUpload = button("Verify & Upload") {
-                    action {
-                        runAsync {
-                            controller.verifyFiles(mainFilePath, headOfficeFilePath, branchesFilePath)
-                        } ui {
-                            if (it.first) {
-                                println("Data in files is correct")
-                                runAsync {
-                                    controller.uploadData()
+            borderpane {
+                right {
+                    button("Verify & Upload") {
+                        action {
+                            runAsync {
+                                controller.verifyFiles(mainFilePath, headOfficeFilePath, branchesFilePath)
+                            } ui {
+                                if (it.first) {
+                                    println("Data in files is correct")
+                                    runAsync {
+                                        controller.uploadData()
+                                    }
+                                } else {
+                                    error(header = "Error in supplied data", content = it.second)
                                 }
-                            } else {
-                                error(header = "Error in supplied data", content = it.second)
                             }
                         }
                     }
                 }
-                buttonCancel = button("Exit") {
-                    action {
-                        Platform.exit()
+                left {
+                    button("Exit") {
+                        action {
+                            Platform.exit()
+                        }
                     }
                 }
             }
