@@ -1,7 +1,5 @@
 package com.dptradeking.contacts.uploader.model
 
-import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import tornadofx.*
@@ -34,22 +32,6 @@ data class SubBroker(
         @SerializedName("incorporationDate")
         val incorporationDate: String
 ) {
-    companion object {
-        @JvmStatic
-        fun getInstance(jsonSubBroker: String): SubBroker? {
-            var subBroker: SubBroker? by singleAssign()
-
-            try {
-                subBroker = Gson().fromJson(jsonSubBroker, SubBroker::class.java)
-            } catch (e: JsonSyntaxException) {
-                subBroker = null
-                e.printStackTrace()
-            }
-
-            return subBroker
-        }
-    }
-
     fun validateName(): Boolean = this.name.isNotEmpty()
 
     fun validateAddress(): Boolean = this.address.isNotEmpty()
@@ -94,6 +76,4 @@ data class SubBroker(
             this.validateEmail() &&
             this.validateRegistrationNumber() &&
             this.validateIncorporationDate()
-
-    fun toJsonString(): String = Gson().toJson(this)
 }

@@ -1,10 +1,7 @@
 package com.dptradeking.contacts.uploader.model
 
-import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import tornadofx.*
 
 /**
  * Creator: Varun Barad
@@ -22,22 +19,6 @@ data class Department(
         @SerializedName("executives")
         val executives: List<Executive>
 ) {
-    companion object {
-        @JvmStatic
-        fun getInstance(jsonDepartment: String): Department? {
-            var department: Department? by singleAssign()
-
-            try {
-                department = Gson().fromJson(jsonDepartment, Department::class.java)
-            } catch (e: JsonSyntaxException) {
-                department = null
-                e.printStackTrace()
-            }
-
-            return department
-        }
-    }
-
     fun validateName(): Boolean = this.name.isNotEmpty()
 
     fun validateAlias(): Boolean = this.alias.isNotEmpty()
@@ -47,6 +28,4 @@ data class Department(
     fun validateDetails(): Boolean = this.validateName() &&
             this.validateAlias() &&
             this.validateExecutives()
-
-    fun toJsonString(): String = Gson().toJson(this)
 }
