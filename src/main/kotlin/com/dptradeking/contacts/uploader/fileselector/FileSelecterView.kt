@@ -1,5 +1,6 @@
 package com.dptradeking.contacts.uploader.fileselector
 
+import com.dptradeking.contacts.uploader.confirmpassword.ConfirmPasswordView
 import javafx.application.Platform
 import javafx.scene.control.TextField
 import javafx.stage.FileChooser
@@ -83,10 +84,7 @@ class FileSelecterView : View("DP-TradeKING Contacts") {
                                 controller.verifyFiles(mainFilePath, headOfficeFilePath, branchesFilePath)
                             } ui {
                                 if (it.first) {
-                                    println("Data in files is correct")
-                                    runAsync {
-                                        controller.uploadData()
-                                    }
+                                    openInternalWindow(view = find<ConfirmPasswordView>(mapOf(ConfirmPasswordView::contacts to it.third)))
                                 } else {
                                     error(header = "Error in supplied data", content = it.second)
                                 }

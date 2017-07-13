@@ -3,7 +3,6 @@ package com.dptradeking.contacts.uploader.fileselector
 import com.dptradeking.contacts.uploader.model.Branch
 import com.dptradeking.contacts.uploader.model.Department
 import com.dptradeking.contacts.uploader.model.SubBroker
-import com.dptradeking.contacts.uploader.util.FirebaseHandler
 import com.dptradeking.contacts.uploader.util.getBranches
 import com.dptradeking.contacts.uploader.util.getDepartments
 import com.dptradeking.contacts.uploader.util.getSubBrokers
@@ -17,17 +16,17 @@ import java.io.FileNotFoundException
  * Project: uploader
  */
 class FileSelectorController : Controller() {
-    lateinit var subBrokers: List<SubBroker>
-    lateinit var headOfficeDepartments: List<Department>
-    lateinit var branches: List<Branch>
-
     fun verifyFiles(
             mainFilePath: String,
             headOfficeFilePath: String,
             branchesFilePath: String
-    ): Pair<Boolean, String> {
+    ): Triple<Boolean, String, Triple<List<Department>, List<Branch>, List<SubBroker>>> {
         var detailsAppropriate: Boolean
         var message: String = ""
+
+        var subBrokers: List<SubBroker> = emptyList()
+        var headOfficeDepartments: List<Department> = emptyList()
+        var branches: List<Branch> = emptyList()
 
         try {
             val mainFile: File = File(mainFilePath)
@@ -50,11 +49,6 @@ class FileSelectorController : Controller() {
             message = e.message!!
         }
 
-        return Pair(detailsAppropriate, message)
-    }
-
-    fun uploadData() {
-        FirebaseHandler().uploadToFirebase(headOffice = headOfficeDepartments, branches = branches, subBrokers = subBrokers)
-        println("Data uploaded successfully")
+        return Triple(detailsAppropriate, message, Triple(headOfficeDepartments, branches, subBrokers))
     }
 }
