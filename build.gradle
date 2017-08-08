@@ -20,6 +20,12 @@ buildscript {
 sourceCompatibility = 1.8
 mainClassName = 'com.dptradeking.contacts.uploader.MainKt'
 
+task fatJar(type: Jar) {
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
 repositories {
     mavenCentral()
 }
